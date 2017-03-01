@@ -1,30 +1,17 @@
-from contextlib import contextmanager
 from conans import ConanFile, CMake, tools
 import os
-
-@contextmanager
-def in_dir(directory):
-    last_dir = os.getcwd()
-    try:
-        os.makedirs(directory)
-    except OSError:
-        pass
-
-    try:
-        os.chdir(directory)
-        yield directory
-    finally:
-        os.chdir(last_dir)
 
 class CppRedisConan(ConanFile):
     name = "cpp_redis"
     version = "master"
+    url = "https://github.com/ikeyan/conan-cpp_redis"
+    license = "MIT"
+    description = "C++11 Lightweight Redis client: async, thread-safe, no dependency, pipelining, multi-platform."
     settings = "os", "compiler", "build_type", "arch"
     requires = (
             "Boost/1.60.0@lasote/stable"
             )
     FOLDER_NAME = "cpp_redis"
-    BUILD_FOLDER_NAME = "cpp_redis/build"
 
     def source(self):
         repository = "https://github.com/Cylix/cpp_redis.git"
@@ -38,13 +25,8 @@ class CppRedisConan(ConanFile):
 
     def build(self):
         cmake = CMake(self.settings)
-            
         self.run("cmake %s/%s %s" % (self.conanfile_directory, self.FOLDER_NAME, cmake.command_line))
         self.run("cmake --build . %s" % cmake.build_config)
-
-#        self.run('mkdir %s' % self.BUILD_FOLDER_NAME)
-#        self.run('cd %s && cmake .. %s' % (self.BUILD_FOLDER_NAME, cmake.command_line))
-#        self.run("cd %s && make -j" % self.BUILD_FOLDER_NAME)
 
     def package(self):
         self.copy("*", dst="include", src=self.FOLDER_NAME+"/includes")
